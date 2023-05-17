@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from .db.conn import get_session, init_models
 from .db.models import generate_uuid
-from .db.schemas import UserCreateSchema, QuestionsSchema, UserSchema
+from .db.schemas import UserCreateSchema, QuestionsSchema, UserSchema, QuestionNumsSchema
 from .db.utils import get_users, add_user, add_question, get_questions, get_user, wav2mp3, add_audio, get_audio, \
     get_last_added_question
 
@@ -26,14 +26,14 @@ async def db_init_models():
     print("Done")
 
 
-@app.get("/api/questions/{questions_num}")
-async def random_questions(questions_num: int,
+@app.post("/api/questions")
+async def random_questions(questions_num: QuestionNumsSchema,
                            session: AsyncSession = Depends(get_session)):
     """Get a random question and add to db"""
 
-    if questions_num <= 0:
+    if questions_num.questions_num <= 0 or questions_num.questions_num is None:
         return {"message": "Question num must be more then 0"}
-    url = f"https://jservice.io/api/random?count={questions_num}"
+    url = f"https://jservice.io/api/random?count={questions_num.questions_num}"
     resp = requests.get(url)
     data = resp.json()
     buffer = None
@@ -50,7 +50,7 @@ async def random_questions(questions_num: int,
             await session.rollback()
             count += 1
     if count != 0:
-        return await random_questions(count, session)
+        return await random_questions(QuestionNumsSchema(questions_num=count), session)
     return buffer
 
 
@@ -59,7 +59,8 @@ async def get_all_questions(session: AsyncSession = Depends(get_session)):
     """Extracts all questions from db"""
 
     questions = await get_questions(session)
-    return [QuestionsSchema(id=q.source_id, source_id=q.source_id, question=q.question, answer=q.answer, created_at=q.created_at) for q in
+    return [QuestionsSchema(id=q.source_id, source_id=q.source_id, question=q.question, answer=q.answer,
+                            created_at=q.created_at) for q in
             questions]
 
 
@@ -132,7 +133,6 @@ async def convert_audio(file: Annotated[UploadFile, File()],
 async def download_mp3(id: int | None = Query(default=None),
                        user_id: int | None = Query(default=None),
                        session: AsyncSession = Depends(get_session)):
-
     if not id:
         return JSONResponse(content={"message": "Not audio id sent"}, status_code=400)
     if not user_id:

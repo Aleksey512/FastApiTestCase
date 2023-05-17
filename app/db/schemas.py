@@ -17,6 +17,10 @@ class UserSchema(BaseModel):
         orm_mode = True
 
 
+class QuestionNumsSchema(BaseModel):
+    questions_num: int | None
+
+
 class QuestionsSchema(BaseModel):
     id: int
     source_id: Optional[int]
