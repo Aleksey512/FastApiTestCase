@@ -73,6 +73,12 @@ volumes:
   postgres_data:
 ```
 
+Запустить docker compose
+
+```bash
+docker compose up --build
+```
+
 ## Example
 
 ### Задание 1
