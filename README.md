@@ -1,6 +1,6 @@
 # FastApiTestCase (Junior)
 
-[Тестовое задание Junior.pdf](%D2%E5%F1%F2%EE%E2%EE%E5%20%E7%E0%E4%E0%ED%E8%E5%20Junior.pdf)
+[TestJunior.pdf](TestJunior.pdf)
 
 ## Используемые библиотеки/фреймворки:
 - [Docker](https://www.docker.com/)
