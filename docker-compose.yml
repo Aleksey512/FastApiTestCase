@@ -14,7 +14,7 @@ services:
       - db
 
   db:
-    image: postgres
+    image: postgres:15.4
     container_name: fastapi_db
     environment:
       POSTGRES_DB: fastapi
@@ -23,18 +23,7 @@ services:
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - /opt/pgsql:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U fastapi_secure_user -d fastapi" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
     restart: always
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 4G
 
 volumes:
   postgres_data:
